@@ -17,19 +17,19 @@ public class Rover {
         this.initialPosition = initialPosition;
     }
 
-    public List<Position> calculateJourney(Iterable<Instruction> instructions) {
-        LinkedList<Position> journey = new LinkedList<Position>();
-        journey.add(initialPosition);
+    public Journey calculateJourney(Iterable<Instruction> instructions) {
+        LinkedList<Position> positions = new LinkedList<Position>();
+        positions.add(initialPosition);
         for (Instruction instruction : instructions) {
-            Position newPosition = getNewPosition(journey.peekLast(), instruction);
+            Position newPosition = getNewPosition(positions.peekLast(), instruction);
             if (plateau.isValidCoordinate(newPosition.getCoordinate())) {
-                journey.add(newPosition);
+                positions.add(newPosition);
             } else {
                 throw new IllegalStateException(
                     String.format("Instruction %s would move us to invalid coordinate %s", instruction, newPosition.getCoordinate()));
             }
         }
-        return journey;
+        return new Journey(positions);
     }
 
     private Position getNewPosition(Position currentPosition, Instruction instruction) {

@@ -6,68 +6,52 @@ import com.rover.terrain.Heading;
 import com.rover.terrain.Plateau;
 import com.rover.terrain.Position;
 
-import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-
-import static com.rover.instruction.Instruction.MOVE;
-import static com.rover.instruction.Instruction.TURN_LEFT;
-import static com.rover.terrain.Heading.NORTH;
+import java.util.Scanner;
 
 public class Main {
 
     public static void main(String[] args) {
-        Coordinate upperRight = new Coordinate(5, 5);
-        Plateau plateau = new Plateau(upperRight);
-
-        Coordinate roverStart = new Coordinate(1, 2);
-        Position roverInitialPosition = new Position(roverStart, NORTH);
-        Rover rover = new Rover(plateau, roverInitialPosition);
-
-        List<Instruction> instructions = new LinkedList<Instruction>();
-        instructions.add(TURN_LEFT);
-        instructions.add(MOVE);
-        instructions.add(TURN_LEFT);
-        instructions.add(MOVE);
-        instructions.add(TURN_LEFT);
-        instructions.add(MOVE);
-        instructions.add(TURN_LEFT);
-        instructions.add(MOVE);
-        instructions.add(MOVE);
-
-        List<Position> journey = rover.calculateJourney(instructions);
-        System.out.println(journey.get(journey.size() - 1));
+        parseInputs();
     }
 
     private static Map<Rover, List<Instruction>> parseInputs() {
-        try (BufferedReader br = new BufferedReader(new FileReader("resources/Input.txt"))) {
-            String topRight = br.readLine();
-            String[] topRightCoords = topRight.split(" ");
-            Coordinate upperRight = new Coordinate(Integer.parseInt(topRightCoords[0]), Integer.parseInt(topRightCoords[0]));
+        try (Scanner scanner = new Scanner(new FileReader("resources/Input.txt"))) {
+            Coordinate upperRight = new Coordinate(scanner.nextInt(), scanner.nextInt());
             Plateau plateau = new Plateau(upperRight);
-            String line;
+            scanner.nextLine(); //burn rest of the line
             Rover rover = null;
-            while((line = br.readLine()) != null) {
+            while(scanner.hasNextLine()) {
                 if (rover == null) {
-                    String[] positionInput = line.split("");
-                    Coordinate roverStart = new Coordinate(Integer.parseInt(positionInput[0]), Integer.parseInt(positionInput[0]));
-                    Heading initialHeading = Heading.parseInput(positionInput[4].charAt(0));
-                    rover = new Rover(plateau, new Position(roverStart, initialHeading));
+                    rover = parseRoverLine(scanner, plateau);
                 } else {
-                    String[] rawInstructions = line.split("");
-                    List<Instruction> instructions = new LinkedList<Instruction>();
-                    for (int i = 0; i < rawInstructions.length; i++) {
-                        instructions.add(Instruction.parseInput(rawInstructions[i].charAt(0)));
-                    }
-                    List<Position> journey = rover.calculateJourney(instructions);
-                    System.out.println(journey.get(journey.size() - 1));
+                    List<Instruction> instructions = parseInstructionLine(scanner);
+                    System.out.println(rover.calculateJourney(instructions).getFinalPosition());
+                    rover = null;
                 }
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
         }
         return null;
+    }
+
+    private static Rover parseRoverLine(Scanner scanner, Plateau plateau) {
+        Coordinate roverStart = new Coordinate(scanner.nextInt(), scanner.nextInt());
+        Heading initialHeading = Heading.parseInput(scanner.next().charAt(0));
+        scanner.nextLine();
+        return new Rover(plateau, new Position(roverStart, initialHeading));
+    }
+
+    private static List<Instruction> parseInstructionLine(Scanner scanner) {
+        String[] rawInstructions = scanner.nextLine().split("");
+        List<Instruction> instructions = new LinkedList<>();
+        for (int i = 0; i < rawInstructions.length; i++) {
+            instructions.add(Instruction.parseInput(rawInstructions[i].charAt(0)));
+        }
+        return instructions;
     }
 }

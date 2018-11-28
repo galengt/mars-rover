@@ -49,8 +49,8 @@ public class RoverTest extends Assert {
         instructions.add(TURN_LEFT);
         instructions.add(MOVE);
         instructions.add(MOVE);
-        List<Position> journey = rover.calculateJourney(instructions);
-        Position finalPosition = journey.get(journey.size() - 1);
+        Journey journey = rover.calculateJourney(instructions);
+        Position finalPosition = journey.getFinalPosition();
         assertThat(finalPosition.getCoordinate().getXPos(), is(1));
         assertThat(finalPosition.getCoordinate().getYPos(), is(3));
         assertThat(finalPosition.getHeading(), is(NORTH));
@@ -70,8 +70,8 @@ public class RoverTest extends Assert {
         instructions.add(TURN_RIGHT);
         instructions.add(TURN_RIGHT);
         instructions.add(MOVE);
-        List<Position> journey = rover.calculateJourney(instructions);
-        Position finalPosition = journey.get(journey.size() - 1);
+        Journey journey = rover.calculateJourney(instructions);
+        Position finalPosition = journey.getFinalPosition();
         assertThat(finalPosition.getCoordinate().getXPos(), is(5));
         assertThat(finalPosition.getCoordinate().getYPos(), is(1));
         assertThat(finalPosition.getHeading(), is(EAST));
