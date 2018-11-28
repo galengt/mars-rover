@@ -17,7 +17,7 @@ public class Rover {
         this.initialPosition = initialPosition;
     }
 
-    public Iterable<Position> calculateJourney(Iterable<Instruction> instructions) {
+    public List<Position> calculateJourney(Iterable<Instruction> instructions) {
         LinkedList<Position> journey = new LinkedList<Position>();
         journey.add(initialPosition);
         for (Instruction instruction : instructions) {
