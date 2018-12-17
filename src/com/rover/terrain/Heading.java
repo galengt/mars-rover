@@ -44,15 +44,15 @@ public enum Heading {
     }
     ;
 
-    public static Heading parseInput(char input) {
+    public static Heading parseInput(String input) {
         switch (input) {
-            case 'N':
+            case "N":
                 return NORTH;
-            case 'E':
+            case "E":
                 return EAST;
-            case 'S':
+            case "S":
                 return SOUTH;
-            case 'W':
+            case "W":
                 return WEST;
             default:
                 throw new IllegalArgumentException(String.format("Unknown heading input %s", input));

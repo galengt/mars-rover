@@ -1,16 +1,18 @@
 package com.rover;
 
 import com.rover.instruction.Instruction;
+import com.rover.input.InstructionParser;
 import com.rover.terrain.Coordinate;
 import com.rover.terrain.Heading;
 import com.rover.terrain.Plateau;
 import com.rover.terrain.Position;
 
 import java.io.FileReader;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Main {
 
@@ -18,7 +20,14 @@ public class Main {
         parseInputs();
     }
 
-    private static Map<Rover, List<Instruction>> parseInputs() {
+    private static Map<JourneyRover, List<Instruction>> parseInputs() {
+//        try {
+//            Files.lines(Paths.get("resources/Input.txt"))
+//                .forEach(new Foo());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+
         try (Scanner scanner = new Scanner(new FileReader("resources/Input.txt"))) {
             Coordinate upperRight = new Coordinate(scanner.nextInt(), scanner.nextInt());
             Plateau plateau = new Plateau(upperRight);
@@ -29,7 +38,7 @@ public class Main {
                     rover = parseRoverLine(scanner, plateau);
                 } else {
                     List<Instruction> instructions = parseInstructionLine(scanner);
-                    System.out.println(rover.calculateJourney(instructions).getFinalPosition());
+                    rover.executeInstructions(instructions);
                     rover = null;
                 }
             }
@@ -39,19 +48,35 @@ public class Main {
         return null;
     }
 
-    private static Rover parseRoverLine(Scanner scanner, Plateau plateau) {
+//    private static class Foo implements Consumer<String> {
+//        JourneyRover rover = null;
+//
+//        public Foo(Plateau plateau) {
+//            this.rover = rover;
+//        }
+//
+//        @Override
+//        public void accept(String s) {
+//            if (rover == null) {
+//                rover = parseRoverLine(scanner, plateau);
+//            } else {
+//                List<Instruction> instructions = parseInstructionLine(scanner);
+//                System.out.println(rover.executeInstructions(instructions).getFinalPosition());
+//                rover = null;
+//            }
+//    }
+
+    private static JourneyRover parseRoverLine(Scanner scanner, Plateau plateau) {
         Coordinate roverStart = new Coordinate(scanner.nextInt(), scanner.nextInt());
-        Heading initialHeading = Heading.parseInput(scanner.next().charAt(0));
+        Heading initialHeading = Heading.parseInput(scanner.next());
         scanner.nextLine();
-        return new Rover(plateau, new Position(roverStart, initialHeading));
+        return new JourneyRover(plateau, new Position(roverStart, initialHeading));
     }
 
     private static List<Instruction> parseInstructionLine(Scanner scanner) {
-        String[] rawInstructions = scanner.nextLine().split("");
-        List<Instruction> instructions = new LinkedList<>();
-        for (int i = 0; i < rawInstructions.length; i++) {
-            instructions.add(Instruction.parseInput(rawInstructions[i].charAt(0)));
-        }
+        List<Instruction> instructions = Stream.of(scanner.nextLine().split(""))
+            .map(new InstructionParser())
+            .collect(Collectors.toList());
         return instructions;
     }
 }

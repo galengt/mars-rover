@@ -19,7 +19,7 @@ import static com.rover.terrain.Heading.NORTH;
 import static com.rover.terrain.Heading.WEST;
 import static org.hamcrest.core.Is.is;
 
-public class RoverTest extends Assert {
+public class JourneyRoverTest extends Assert {
 
     Coordinate upperRight;
     Plateau plateau;
@@ -28,18 +28,18 @@ public class RoverTest extends Assert {
     List<Instruction> instructions = new LinkedList<Instruction>();
 
 
-    private Rover setup(int upperRightX, int upperRightY, int roverStartX, int roverStartY, Heading roverStartHeading) {
+    private JourneyRover setup(int upperRightX, int upperRightY, int roverStartX, int roverStartY, Heading roverStartHeading) {
         upperRight = new Coordinate(upperRightX, upperRightY);
         plateau = new Plateau(upperRight);
 
         roverStart = new Coordinate(roverStartX, roverStartY);
         roverInitialPosition = new Position(roverStart, roverStartHeading);
-        return new Rover(plateau, roverInitialPosition);
+        return new JourneyRover(plateau, roverInitialPosition);
     }
 
     @Test
     public void circleLeft() {
-        Rover rover = setup(5, 5, 1,2, NORTH);
+        JourneyRover rover = setup(5, 5, 1,2, NORTH);
         instructions.add(TURN_LEFT);
         instructions.add(MOVE);
         instructions.add(TURN_LEFT);
@@ -49,7 +49,7 @@ public class RoverTest extends Assert {
         instructions.add(TURN_LEFT);
         instructions.add(MOVE);
         instructions.add(MOVE);
-        Journey journey = rover.calculateJourney(instructions);
+        Journey journey = rover.executeInstructions(instructions);
         Position finalPosition = journey.getFinalPosition();
         assertThat(finalPosition.getCoordinate().getXPos(), is(1));
         assertThat(finalPosition.getCoordinate().getYPos(), is(3));
@@ -58,7 +58,7 @@ public class RoverTest extends Assert {
 
     @Test
     public void circleRight() {
-        Rover rover = setup(5, 5, 3, 3, EAST);
+        JourneyRover rover = setup(5, 5, 3, 3, EAST);
         instructions = new LinkedList<Instruction>();
         instructions.add(MOVE);
         instructions.add(MOVE);
@@ -70,7 +70,7 @@ public class RoverTest extends Assert {
         instructions.add(TURN_RIGHT);
         instructions.add(TURN_RIGHT);
         instructions.add(MOVE);
-        Journey journey = rover.calculateJourney(instructions);
+        Journey journey = rover.executeInstructions(instructions);
         Position finalPosition = journey.getFinalPosition();
         assertThat(finalPosition.getCoordinate().getXPos(), is(5));
         assertThat(finalPosition.getCoordinate().getYPos(), is(1));
@@ -79,17 +79,17 @@ public class RoverTest extends Assert {
 
     @Test(expected = IllegalStateException.class)
     public void fallOffLeft() {
-        Rover rover = setup(5, 5, 0, 0, WEST);
+        JourneyRover rover = setup(5, 5, 0, 0, WEST);
         instructions = new LinkedList<Instruction>();
         instructions.add(MOVE);
-        rover.calculateJourney(instructions);
+        rover.executeInstructions(instructions);
     }
 
     @Test(expected = IllegalStateException.class)
     public void fallOffTop() {
-        Rover rover = setup(5, 5, 5, 5, EAST);
+        JourneyRover rover = setup(5, 5, 5, 5, EAST);
         instructions = new LinkedList<Instruction>();
         instructions.add(MOVE);
-        rover.calculateJourney(instructions);
+        rover.executeInstructions(instructions);
     }
 }
